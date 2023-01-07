@@ -1,29 +1,32 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted, ref } from "vue";
+  
+// 导入LF核心模块和对应的样式文件
+import LogicFlow from "@logicflow/core";
+import "@logicflow/core/dist/style/index.css";
+
+// 声明容器的对应ref对象和LF对象
+const container = ref();
+const lf = ref<LogicFlow>();
+
+onMounted(() => {
+  lf.value = new LogicFlow({
+    // 通过选项指定了渲染的容器和需要显示网格
+    container: container.value,
+    grid: true,
+  })
+  lf.value.render();
+})
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+	<!--  提供一个LF渲染的容器  -->
+  <div ref="container" class="container"></div>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.container {
+  width: 500px;
+  height: 400px;
 }
 </style>

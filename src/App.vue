@@ -1,10 +1,10 @@
 <template>
-  <div>
-      <span class="node" @mousedown="onStart('CustomNode')">CustomNode</span>
-      <span class="node" @mousedown="onStart('image')">image</span>
-  </div>
+    <div>
+        <span class="node" @mousedown="onStart('CustomNode')">CustomNode</span>
+        <span class="node" @mousedown="onStart('storageTank1')">storageTank1</span>
+    </div>
   <!--  提供一个LF渲染的容器  -->
-  <div ref="container" class="container"></div>
+    <div ref="container" class="container"></div>
 </template>
 
 <script setup lang="ts">
@@ -17,6 +17,7 @@ import "@logicflow/core/dist/style/index.css";
 import "@logicflow/extension/lib/style/index.css";
 
 import CustomNode from "./CustomNode";
+import registerStorageTank from './views/node/registerStorageTank.js'
 
 // 声明容器的对应ref对象和LF对象
 const container = ref();
@@ -89,13 +90,14 @@ onMounted(() => {
         ]
     })
     lf.value.register(CustomNode);
+    registerStorageTank(lf.value, 'storageTank1');
     lf.value.on('custom:event', (r) => {
         console.log(r)
     });
     lf.value.render(graphData);
 })
 
-function onStart(type: any){
+function onStart(type: any) {
     lf.value?.dnd.startDrag({
         type,
         text: `${type}节点`
@@ -107,7 +109,8 @@ function onStart(type: any){
     width: 500px;
     height: 400px;
 }
-.node{
+
+.node {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

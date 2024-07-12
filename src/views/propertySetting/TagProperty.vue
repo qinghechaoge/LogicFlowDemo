@@ -1,0 +1,210 @@
+<template>
+  <div>
+    <a-form :label-col="{ style: { width: '70px' } }" :model="formData">
+      <a-form-item label="位号1">
+        <!--        <a-select size="mini" v-model:value="formData.tagString" filterable>-->
+        <!--          <a-select-option v-for="item in tagList" :key="item.code" :label="item.pointName" :value="item.code" />-->
+        <!--        </a-select>-->
+        <SelPoint
+          v-model:value="formData.tagString"
+          :selComPath="SelPointModal"
+          :params="{
+            facilityId: facilityId,
+            facilityType: facilityType,
+          }"
+          @change="
+            (_, row) => {
+              row && (formData.tagText = row.pointName);
+            }
+          "
+          isRadioSelection="true"
+          placeholder="请选择采样点"
+        />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="formData.tagText" size="mini" />
+      </a-form-item>
+      <a-form-item label="数据类型">
+        <a-select v-model:value="formData.dataType">
+          <a-select-option value="lastResultValue"> 最新分析项结果 </a-select-option>
+          <a-select-option value="lastRtdbValue"> 实时数据库数据 </a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="标识符">
+        <a-input v-model:value="formData.tagLabel" size="mini" />
+      </a-form-item>
+      <!--      <a-form-item label="标签1">-->
+      <!--        <a-input v-model:value="formData.tagBeLabel" size="mini" />-->
+      <!--      </a-form-item>-->
+      <!--      <a-form-item label="单位">-->
+      <!--        <a-input v-model:value="formData.tagUnit" size="mini" />-->
+      <!--      </a-form-item>-->
+      <a-form-item label="背景色">
+        <a-input type="color" show-alpha v-model:value="formData.tagBg" />
+      </a-form-item>
+      <a-form-item label="宽度">
+        <a-input v-model:value="formData.width" type="number" size="mini" />
+      </a-form-item>
+      <a-form-item label="内容项数">
+        <a-input-number v-model:value="formData.lineNum" size="mini" />
+      </a-form-item>
+      <a-form-item label="单项高度">
+        <a-input v-model:value="formData.height" type="number" size="mini" />
+      </a-form-item>
+      <a-form-item label="底部标签">
+        <a-switch size="mini" v-model:checked="formData.isTagAfter" active-color="#13ce66" inactive-color="#909090" />
+      </a-form-item>
+
+      <!--      <a-form-item v-if="formData.isTagAfter" label="位号2">-->
+      <!--        &lt;!&ndash;        <a-select size="mini" v-model:value="formData.tagString2" filterable>&ndash;&gt;-->
+      <!--        &lt;!&ndash;          <a-select-option v-for="item in tagList" :key="item.code" :label="item.pointName" :value="item.code" />&ndash;&gt;-->
+      <!--        &lt;!&ndash;        </a-select>&ndash;&gt;-->
+      <!--        <SelPoint-->
+      <!--          v-model:value="formData.tagString2"-->
+      <!--          :selComPath="SelPointModal"-->
+      <!--          :params="{-->
+      <!--            facilityId: facilityId,-->
+      <!--            facilityType: facilityType,-->
+      <!--          }"-->
+      <!--          @change="-->
+      <!--            (_, row) => {-->
+      <!--              row && (formData.tagBeLabel = row.pointName);-->
+      <!--            }-->
+      <!--          "-->
+      <!--          isRadioSelection="true"-->
+      <!--          placeholder="请选择采样点"-->
+      <!--        />-->
+      <!--      </a-form-item>-->
+      <a-form-item v-if="formData.isTagAfter" label="底部标签">
+        <a-input v-model:value="formData.tagAfLabel" size="mini" />
+      </a-form-item>
+      <a-form-item label="锚点">
+        <a-button size="mini" type="text" preIcon="ant-design:plus-outlined" style="margin-left: 150px" @click="handleAdd" />
+        <div v-for="(item, index) in formData.anchorsOffset" :key="index">
+          <div>
+            <a-input v-model:value.number="formData.anchorsOffset[index][0]" type="number" size="mini" class="dot-item" />
+            <a-input v-model:value.number="formData.anchorsOffset[index][1]" type="number" size="mini" class="dot-item" />
+            <a-button size="mini" type="text" preIcon="ant-design:delete-outlined" @click="handleRemove(index)" />
+          </div>
+        </div>
+      </a-form-item>
+    </a-form>
+  </div>
+</template>
+
+<script>
+  import SelPoint from '/@/components/Form/src/jeecg/components/LSelectCom.vue';
+  import SelPointModal from '/@/views/common/bizmodal/facility/selSamplePoint/selTablePoint.vue';
+  import flowMixin from '@/views/bpm/processDesign/designMini/mixins/flowMixin';
+  export default {
+    name: '',
+    components: { SelPoint },
+    props: {
+      nodeData: Object,
+      lf: Object || String,
+      tagList: Array,
+      facilityId: String,
+      facilityType: String,
+    },
+    data() {
+      return {
+        SelPointModal: SelPointModal,
+        formData: {
+          tagString: '',
+          tagString2: '',
+          tagText: '',
+          dataType: 'lastResultValue',
+          tagBg: 'rgba(91, 91, 91, 1)',
+          tagBeLabel: '',
+          tagAfLabel: '',
+          tagUnit: '',
+          tagBefore: '',
+          tagAfter: '',
+          tagLabel: '',
+          isTagAfter: false,
+          width: 100,
+          lineNum: 1,
+          height: 20,
+          anchorsOffset: [
+            [50, 0],
+            [0, 30],
+            [-50, 0],
+            [0, -30],
+          ],
+        },
+      };
+    },
+    computed: {
+      flowMixin() {
+        return flowMixin;
+      },
+      SelFormModal() {
+        return SelFormModal;
+      },
+    },
+    watch: {
+      formData: {
+        handler: function () {
+          this.onSubmit();
+        },
+        deep: true,
+      },
+      'formData.isTagAfter'(val) {
+        if (!val) {
+          this.formData.tagString2 = '';
+          this.formData.tagAfLabel = '';
+        }
+      },
+    },
+    mounted() {
+      const { properties, text } = this.$props.nodeData;
+      if (properties) {
+        this.formData = Object.assign({}, this.$data.formData, properties);
+      }
+      if (text && text.value) {
+        this.formData.text = text.value;
+      }
+    },
+    methods: {
+      /**
+       * 提交
+       */
+      onSubmit() {
+        const { id } = this.$props.nodeData;
+        this.$props.lf.setProperties(id, this.formData);
+        this.$props.lf.getModelById(id).updateAttributes({
+          anchorsOffset: this.formData.anchorsOffset,
+          tagString: this.formData.tagString,
+          tagString2: this.formData.tagString2,
+          tagText: this.formData.tagText,
+          tagBg: this.formData.tagBg,
+          tagBeLabel: this.formData.tagBeLabel,
+          tagAfLabel: this.formData.tagAfLabel,
+          tagUnit: this.formData.tagUnit,
+          width: this.formData.width,
+          height: this.formData.isTagAfter ? this.formData.height * 3 : this.formData.height * 2,
+          tagBefore: '',
+          tagAfter: '',
+          isTagAfter: this.formData.isTagAfter,
+        });
+      },
+      handleAdd() {
+        this.formData.anchorsOffset.push(Array(2).fill(0));
+      },
+      handleRemove(index) {
+        this.formData.anchorsOffset.splice(index, 1);
+      },
+    },
+  };
+</script>
+
+<style lang="less" scoped>
+  .dot-add {
+    font-size: 18px;
+  }
+  .dot-item {
+    width: 80px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+</style>

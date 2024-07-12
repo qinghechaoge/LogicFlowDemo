@@ -1,20 +1,19 @@
 import { HtmlNodeModel, HtmlNode } from '@logicflow/core';
-import { all_svg } from '../../assets/images/flow/index';
 
-export default function registerStorageTank(lf, custom) {
-  lf.register(custom, () => {
-    class UmlModel extends HtmlNodeModel {
+export default function registerArrow(lf, custom) {
+  lf.register('arrow', () => {
+    class ArrowModel extends HtmlNodeModel {
       constructor(data, graphModel) {
         super(data, graphModel);
-        const { width = 100, height = 100, text = '' } = data.properties;
+        const { width = 60, height = 60, text = '', anchorsOffset= [
+          [0, 0],
+          [-30, 30],
+          [-30, 0],
+          [-30, -30],
+        ] } = data.properties;
         this.width = width;
-        this.height = height;
-        this.anchorsOffset = [
-          [50, 0],
-          [0, 50],
-          [-50, 0],
-          [0, -50],
-        ];
+        this.height = width;
+        this.anchorsOffset = anchorsOffset;
         data.text = {
           value: text,
           x: data.x,
@@ -23,10 +22,10 @@ export default function registerStorageTank(lf, custom) {
       }
     }
 
-    class UmlNode extends HtmlNode {
+    class ArrowNode extends HtmlNode {
       constructor(data, graphModel) {
         data.text = {
-          value: (data.text && data.text.value) || '字体',
+          value: '',
           x: data.x,
           y: data.y,
           draggable: true,
@@ -49,14 +48,17 @@ export default function registerStorageTank(lf, custom) {
       }
 
       setHtml(rootEl) {
+        debugger
         const attributes = this.props.model;
         const { properties } = attributes;
-        const { deg = 0 } = properties;
+        const { deg = 180, bgColor = '#909090', width = 60 } = properties;
         const el = document.createElement('div');
-        el.className = 'uml';
+        el.className = 'arrow';
         const html = `
                 <div>
-                 <img src="${all_svg[custom]}" style="width:100%;height:100%;transform:rotate(${deg}deg);"  draggable="false"/>
+                 <span style="float: left;width: 0; height: 0;border-width: ${
+                   width / 2
+                 }px;border-style: solid;border-color: transparent ${bgColor} transparent transparent;transform: rotate(${deg}deg);"></span>
                 </div>
               `;
         el.innerHTML = html;
@@ -64,10 +66,13 @@ export default function registerStorageTank(lf, custom) {
         rootEl.innerHTML = '';
         rootEl.appendChild(el);
       }
+      setAttributes(){
+        debugger
+      }
     }
     return {
-      view: UmlNode,
-      model: UmlModel,
+      view: ArrowNode,
+      model: ArrowModel,
     };
   });
 }
